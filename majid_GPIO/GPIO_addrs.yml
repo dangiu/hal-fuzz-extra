@@ -1,0 +1,40 @@
+architecture: ARMCortexM
+base_address: 134217728
+entry_point: 134221037
+symbols:
+  134218133: __do_global_dtors_aux
+  134218169: frame_dummy
+  134218197: __aeabi_uldivmod
+  134218245: __udivmoddi4
+  134218961: __aeabi_idiv0
+  134218965: SystemInit
+  134219041: HAL_MspInit
+  134219045: HAL_InitTick
+  134219113: HAL_Init
+  134219165: HAL_IncTick
+  134219189: HAL_GetTick
+  134219201: HAL_Delay
+  134219241: HAL_NVIC_SetPriorityGrouping
+  134219277: HAL_NVIC_SetPriority
+  134219381: HAL_SYSTICK_Config
+  134219425: HAL_GPIO_Init
+  134219853: HAL_GPIO_TogglePin
+  134219869: HAL_RCC_OscConfig
+  134220641: HAL_RCC_GetSysClockFreq
+  134220733: HAL_RCC_ClockConfig
+  134221037: Reset_Handler
+  134221117: DMA1_Stream3_IRQHandler
+  134221121: main
+  134221361: NMI_Handler
+  134221363: HardFault_Handler
+  134221365: MemManage_Handler
+  134221367: BusFault_Handler
+  134221369: UsageFault_Handler
+  134221371: SVC_Handler
+  134221373: DebugMon_Handler
+  134221375: PendSV_Handler
+  134221377: SysTick_Handler
+  134221381: __libc_init_array
+  134221453: _init
+  134221465: _fini
+  553648200: UnresolvableCallTarget

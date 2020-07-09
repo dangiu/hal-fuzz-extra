@@ -1,0 +1,14 @@
+HOW TO RUN:
+python -m hal_fuzz.harness -c Fatfs.yml ./inputs/garbage
+
+TIPS:
+Create a running configuration in pycharm so it's easier to launch and debug
+
+
+e.g
+python3 -m hal_fuzz.harness -c Fatfs.yml ./inputs/garbage -d -t -b 0x0800581c
+
+
+0800572c
+
+08005220

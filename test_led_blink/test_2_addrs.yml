@@ -1,0 +1,50 @@
+architecture: ARMCortexM
+base_address: 134217728
+entry_point: 134219517
+symbols:
+  134218121: __do_global_dtors_aux
+  134218157: frame_dummy
+  134218185: __aeabi_uldivmod
+  134218233: __udivmoddi4
+  134218949: __aeabi_idiv0
+  134218953: main
+  134218993: SystemClock_Config
+  134219181: MX_GPIO_Init
+  134219285: Error_Handler
+  134219301: HAL_MspInit
+  134219381: NMI_Handler
+  134219395: HardFault_Handler
+  134219401: MemManage_Handler
+  134219407: BusFault_Handler
+  134219413: UsageFault_Handler
+  134219419: SVC_Handler
+  134219433: DebugMon_Handler
+  134219447: PendSV_Handler
+  134219461: SysTick_Handler
+  134219473: SystemInit
+  134219517: Reset_Handler
+  134219597: DMA1_Stream3_IRQHandler
+  134219601: HAL_Init
+  134219669: HAL_InitTick
+  134219765: HAL_IncTick
+  134219805: HAL_GetTick
+  134219829: HAL_Delay
+  134219897: __NVIC_SetPriorityGrouping
+  134219969: __NVIC_GetPriorityGrouping
+  134219997: __NVIC_SetPriority
+  134220081: NVIC_EncodePriority
+  134220185: SysTick_Config
+  134220253: HAL_NVIC_SetPriorityGrouping
+  134220275: HAL_NVIC_SetPriority
+  134220331: HAL_SYSTICK_Config
+  134220357: HAL_GPIO_Init
+  134221177: HAL_GPIO_WritePin
+  134221227: HAL_GPIO_TogglePin
+  134221281: HAL_RCC_OscConfig
+  134222529: HAL_RCC_ClockConfig
+  134222989: HAL_RCC_GetSysClockFreq
+  134223345: __libc_init_array
+  134223417: memset
+  134223433: _init
+  134223445: _fini
+  553648200: UnresolvableCallTarget

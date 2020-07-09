@@ -136,7 +136,7 @@ class SparklyStack(object):
     def pp(self, start, end, downward=False):
         print(self._pp(start, end, downward))
 
-def step(self, fancy=False):
+def step(self, fancy=True):
     curpc = self.reg_read(unicorn.arm_const.UC_ARM_REG_PC)
     result = self.emu_start(curpc | 1, 0, timeout=0, count=1)
     newpc = self.reg_read(unicorn.arm_const.UC_ARM_REG_PC)
@@ -159,12 +159,12 @@ def add_breakpoint(addr):
     return breakpoints.index(addr)
 
 
-def del_breakpoint(handle):
+def del_breakpoint(addr_or_index):
     global breakpoints
-    if handle in breakpoints:
-        breakpoints[breakpoitns.index(handle)] = -1
+    if addr_or_index in breakpoints:
+        breakpoints[breakpoints.index(addr_or_index)] = -1
     else:
-        breakpoints[handle] = -1
+        breakpoints[addr_or_index] = -1
 
 
 breakpoints = []

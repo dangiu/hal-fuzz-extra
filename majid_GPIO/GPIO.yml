@@ -1,0 +1,39 @@
+include:
+  - ./cortexm_memory.yml
+  - ./stm32f4_hal.yml
+  - ./GPIO_addrs.yml
+
+use_nvic: False
+use_timers: False
+
+memory_map:
+  ivt: {base_addr: 0x0, file: ./GPIO.bin,
+    permissions: r-x, size: 0x800000}
+  rom: {base_addr: 0x08000000, file: ./GPIO.bin,
+    permissions: r-x, size: 0x80000}
+
+handlers:
+  BSP_IO_ConfigPin:
+    handler:
+  udp_next_iss:
+    handler: hal_fuzz.handlers.lwip.udp_next_iss_hack
+
+  I2C_WaitOnFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnMasterAddressFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnTXEFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnBTFFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnRXNEFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  HAL_GPIO_Init:
+    handler: hal_fuzz.handlers.custom.gpio_init
+  HAL_GPIO_WritePin:
+    handler: hal_fuzz.handlers.custom.gpio_write_pin
+  HAL_GPIO_TogglePin:
+    handler: hal_fuzz.handlers.custom.gpio_toggle_pin
+  HAL_Delay:
+    handler: hal_fuzz.handlers.custom.delay
+

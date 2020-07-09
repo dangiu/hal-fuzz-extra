@@ -1,4 +1,4 @@
-UNICORN_QEMU_FLAGS="--python=/usr/bin/python3" make
+UNICORN_QEMU_FLAGS="--python=python3" make
 cd ./unicorn_mode
 ./build_unicorn_support.sh
 cd ..
