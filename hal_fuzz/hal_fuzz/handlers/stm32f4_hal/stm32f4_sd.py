@@ -1,3 +1,5 @@
+# Author Giuliani Daniele
+
 from unicorn.arm_const import *
 import struct
 from ...models.sd import SDModel
@@ -161,7 +163,7 @@ def HAL_SD_WriteBlocks(uc):
         data_string = re.sub("(.{64})", "\\1\n", uc.mem[data_p:data_p + data_length].hex(), 0, re.DOTALL)
         print("data: \n{}".format(data_string))
 
-    # TODO check if this part works
+    # TODO refractor this part
     if number_of_blocks == 1:
         SDModel.write_block(block_add, bytes(uc.mem[data_p:data_p + data_length]))
     else:
@@ -190,7 +192,7 @@ def HAL_SD_ReadBlocks(uc):
         print("block address: 0x{}".format(struct.pack(">I", block_add).hex()))
         print("number of blocks: {}".format(number_of_blocks))
 
-    # TODO finish implmeentation and see if it works
+    # TODO refractor this part
     if number_of_blocks == 1:
         data = SDModel.read_block(block_add)
         # place the content inside the correct buffer
