@@ -8,6 +8,7 @@
 import libscrc
 import re
 from bitarray import bitarray
+import struct
 
 
 def crc_and_last_bit(input_bytes):
@@ -137,7 +138,7 @@ class SDModel:
     RSV2 = bitarray('000000')           # Reserved - 6 bits
 
     C_SIZE = bitarray()                 # Size - 22 bits
-    C_SIZE.frombytes(0x01D27F.to_bytes(3, 'big'))
+    C_SIZE.frombytes(0x00127F.to_bytes(3, 'big'))
     C_SIZE = C_SIZE[-22:]
 
     RSV3 = bitarray('0')                # Reserved - 1 bit
@@ -183,6 +184,7 @@ class SDModel:
 
     # TODO add possibility to start SD model with a predefined image (maybe using some sort of constructor or something passed as parameter)
     # TODO test SD with reduced size
+    # TODO idea: replace_disk(new disk) or use_disk(new disk)
 
     # these methods work only for single block write/read
     @classmethod
@@ -234,3 +236,28 @@ class SDModel:
             f.write(cls.read_block(i))
         f.close()
 
+    @classmethod
+    def export_as_dictionary(cls, name):
+        # export as a binary dictionary in the form
+        # block address, content
+        # 32 bit integer in Big endian, 512 byte block content
+        path = './' + name
+        f = open(path, 'wb')
+        for k, v in cls.disk.items():
+            f.write(struct.pack('>I', k))
+            f.write(v)
+        f.close()
+
+    @classmethod
+    def import_from_dictionary(cls, name):
+        # import as a binary dictionary in the form
+        # block address, content
+        # 32 bit integer in Big endian, 512 byte block content
+        path = './' + name
+        f = open(path, 'rb')
+        while f.readable():
+            a_bytes = f.read(4)
+            content = f.read(512)
+            addr = struct.unpack('>I', a_bytes)
+            cls.disk[addr] = content
+        f.close()
