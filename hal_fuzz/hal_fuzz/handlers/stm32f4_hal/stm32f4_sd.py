@@ -165,7 +165,7 @@ def HAL_SD_WriteBlocks(uc):
 
     # TODO refractor this part
     if number_of_blocks == 1:
-        SDModel.write_block(block_add, bytes(uc.mem[data_p:data_p + data_length]))
+        SDModel.disk.write_block(block_add, bytes(uc.mem[data_p:data_p + data_length]))
     else:
         print("ERROR: MULTI BLOCK WRITE NOT SUPPORTED")
 
@@ -184,7 +184,7 @@ def HAL_SD_ReadBlocks(uc):
     number_of_blocks = uc.reg_read(UC_ARM_REG_R3)
 
     # data length
-    data_length = number_of_blocks * SDModel.BLOCK_SIZE;
+    data_length = number_of_blocks * SDModel.BLOCK_SIZE
 
     if DEBUG:
         print("hsd_bp: 0x{}".format(struct.pack(">I", hsd_bp).hex()))
@@ -194,7 +194,7 @@ def HAL_SD_ReadBlocks(uc):
 
     # TODO refractor this part
     if number_of_blocks == 1:
-        data = SDModel.read_block(block_add)
+        data = SDModel.disk.read_block(block_add)
         # place the content inside the correct buffer
         #  uc.mem_write(hsd_bp + context_offset, struct.pack("<I", state))
         uc.mem_write(data_p, data)

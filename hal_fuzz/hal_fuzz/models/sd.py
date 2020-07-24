@@ -9,6 +9,7 @@ import libscrc
 import re
 from bitarray import bitarray
 import struct
+from majid_fatfs.disk import Disk
 
 
 def crc_and_last_bit(input_bytes):
@@ -180,84 +181,4 @@ class SDModel:
     CID = compute_CID(MID, OID, PNM, PRV, PSN, RSV, MDT)
 
     # initialize empty disk
-    disk = {}
-
-    # TODO add possibility to start SD model with a predefined image (maybe using some sort of constructor or something passed as parameter)
-    # TODO test SD with reduced size
-    # TODO idea: replace_disk(new disk) or use_disk(new disk)
-
-    # these methods work only for single block write/read
-    @classmethod
-    def write_block(cls, addr, content):
-        # write block
-        cls.disk[addr] = content
-
-    @classmethod
-    def read_block(cls, addr):
-        # initialize return value as block (512 bytes) of zeros
-        block = bytes(512)
-        # if block exists return it
-        if addr in cls.disk:
-            block = cls.disk[addr]
-        return block
-
-    @classmethod
-    def get_block_count(cls):
-        # return the number of blocks written (that are not empty) on the disk
-        return len(cls.disk.keys())
-
-    @classmethod
-    def get_block_list(cls):
-        # return the list of addresses of blocks not empty
-        blocks = []
-        for addr in cls.disk.keys():
-            blocks.append(addr)
-        return blocks
-
-    @classmethod
-    def print_block(cls, addr):
-        if addr in cls.disk:
-            block = cls.disk[addr]
-            block_string = re.sub("(.{32})", "\\1\n", block.hex(), 0, re.DOTALL)
-            block_string = re.sub("(.{2})", "\\1 ", block_string, 0)
-            print(block_string)
-        else:
-            print("This block does not exist!")
-
-    @classmethod
-    def export_to_file(cls, name):
-        path = './' + name
-        f = open(path, 'wb')
-        block_list = cls.get_block_list()
-        block_list.sort()
-        first_block = block_list[0]
-        last_block = block_list[-1]
-        for i in range(first_block, last_block + 1):
-            f.write(cls.read_block(i))
-        f.close()
-
-    @classmethod
-    def export_as_dictionary(cls, name):
-        # export as a binary dictionary in the form
-        # block address, content
-        # 32 bit integer in Big endian, 512 byte block content
-        path = './' + name
-        f = open(path, 'wb')
-        for k, v in cls.disk.items():
-            f.write(struct.pack('>I', k))
-            f.write(v)
-        f.close()
-
-    @classmethod
-    def import_from_dictionary(cls, name):
-        # import as a binary dictionary in the form
-        # block address, content
-        # 32 bit integer in Big endian, 512 byte block content
-        path = './' + name
-        f = open(path, 'rb')
-        while f.readable():
-            a_bytes = f.read(4)
-            content = f.read(512)
-            addr = struct.unpack('>I', a_bytes)
-            cls.disk[addr] = content
-        f.close()
+    disk = Disk(BLOCK_SIZE)

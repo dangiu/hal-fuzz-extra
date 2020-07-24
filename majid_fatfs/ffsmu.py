@@ -4,6 +4,7 @@
 import struct
 from majid_fatfs.disk import Disk
 from bitarray import bitarray
+import os
 
 
 def mask_bytes(input, mask):
@@ -94,10 +95,6 @@ class FFSMU:
         # Setup variables used to navigate filesystem
         self.current_position = self.data_offset    # set initial position to root directory
 
-        print('test') # TODO remove
-        # TODO see notebook
-        # TODO get offset to all main structures
-
     def read_sector(self, sec_number):
         return self.disk.read(self.base_offset + (sec_number * self.bs_bpb['BPB_BytsPerSec']), self.bs_bpb['BPB_BytsPerSec'])
 
@@ -107,10 +104,43 @@ class FFSMU:
         else:
             self.disk.write(self.base_offset + (sec_number * self.bs_bpb['BPB_BytsPerSec']), self.bs_bpb['BPB_BytsPerSec'], sec_content)
 
+    def write_cluster(self, cluster, content):
+        """
+        Writes content to the beginning of the cluster.
+        Content size must be smaller or equal to cluster size, remaining space in cluster is filled with zeros.
+        """
+        if len(content) > self.CLUSTER_SIZE:
+            print('Error write_cluster(): content must be smaller than CLUSTER_SIZE')
+            return
+
+        # TODO test this method
+
+        content_index = 0
+        offset = self.get_offset_from_cluster(cluster)
+        end_offset = offset + self.CLUSTER_SIZE
+        while offset < end_offset:
+            # get a block worth of content
+            if content_index + self.disk.block_size < len(content):
+                chunk = content[content_index:content_index + self.disk.block_size]
+            if content_index < len(content):
+                # get last bit of content
+                chunk = content[content_index:]
+                # pad content with 0 until end of block
+                if len(chunk) < self.disk.block_size:
+                    chunk = chunk + bytes(self.disk.block_size - len(chunk))
+            else:
+                chunk = bytes(self.disk.block_size)
+            content_index = content_index + 512
+            # write block
+            self.disk.write(offset, chunk)
+            # increase offset
+            offset = offset + self.disk.block_size
+
+
     def get_cluster_from_offset(self, offset):
         """Given an offset, returns the cluster number (which is also the entry index in the FAT)."""
         shifted = offset - self.data_offset             # distance from beginning of the first data cluster)
-        return (shifted % (self.CLUSTER_SIZE)) + self.bs_bpb['BPB_RootClus']     # cluster number
+        return (shifted // (self.CLUSTER_SIZE)) + self.bs_bpb['BPB_RootClus']     # cluster number
 
     def get_offset_from_cluster(self, cluster):
         """Given a cluster number, returns the offset at which it starts."""
@@ -131,10 +161,36 @@ class FFSMU:
             entry = mask_bytes(entry, b'\xff\xff\xff\x0f')
         return entries
 
+    def get_free_cluster(self, n):
+        """Return a list of indexes, the first n encountered empty clusters in the FAT (possibly not contiguous)"""
+        # start looking from cluster 3 (first 2 entry are reserved, 3rd is root dir)
+        index = 3
+        free_clusters = []
+        while True:
+            entry = self.disk.read(self.fat_offset + index * 4, 4)
+            entry = mask_bytes(entry, b'\xff\xff\xff\x0f')
+            if entry == b'\x00\x00\x00\x00':
+                free_clusters.append(index)
+                if len(free_clusters) == n:
+                    return free_clusters
+            index = index + 1
+
+    def create_cluster_chain(self, size):
+        """Allocates a cluster chain of given size in the FAT and returns a list of cluster indexes used."""
+        clusters = self.get_free_cluster(size)
+        # write chain inside FAT
+        for i in range(len(clusters)):
+            if i == len(clusters) - 1: # last element
+                next = b'\xff\xff\xff\x0f'  # End of Chain marker
+            else:
+                next = struct.pack('<I', clusters[i + 1])
+            self.disk.write(self.fat_offset + clusters[i] * 4, next)
+        return clusters
+
     def ls(self):
         """
         Lists Directory Entries in current position.
-        TODO cannot read long entries
+        TODO cannot read long entries, implement
         """
         cluster = self.get_cluster_from_offset(self.current_position)
         cluster_chain = self.get_cluster_chain(cluster)  # get cluster allocated to current position
@@ -158,11 +214,11 @@ class FFSMU:
                 first_clus = e['DIR_FstClusLO'] + e['DIR_FstClusHI']
                 first_clus = struct.unpack('<I', first_clus)[0]
                 size = struct.unpack('<I', e['DIR_FileSize'])[0]
-                print('{}.{} -- Attr: {} -- Clus: {} -- Size in bytes: {}'.format(e['DIR_Name'], e['DIR_Ext'], attr, first_clus, size))
+                print('{}.{} -- Attr: {} -- Clus: {} -- Size in bytes: {}'.format(e['DIR_Name'].decode('ascii').strip(), e['DIR_Ext'].decode('ascii'), attr, first_clus, size))
 
             # prepare new position
             pos = pos + 32
-            if pos >= (self.get_cluster_from_offset(cluster) + self.CLUSTER_SIZE):
+            if pos >= (self.get_offset_from_cluster(cluster) + self.CLUSTER_SIZE):
                 # end of cluster reached, go to beginning of next cluster if available
                 if len(cluster_chain) == 0:
                     return
@@ -171,12 +227,53 @@ class FFSMU:
                     pos = self.get_offset_from_cluster(cluster)
 
 
-    def cd(self, name):
+    def cd(self, shortname):
         """
-        Change current position to another directory.
-        TODO cannot read long entries
+        Given a shortname, changes position form current location to an another directory,
+        if a dir entry with such name exists.
+        TODO cannot read long entries, implement
         """
-        print('IMPLEMENT') # TODO implement
+        cluster = self.get_cluster_from_offset(self.current_position)
+        cluster_chain = self.get_cluster_chain(cluster)  # get cluster allocated to current position
+        cluster_chain.pop(0)  # remove first cluster (current cluster already setted)
+        pos = self.current_position
+        while True:
+            entry = self.disk.read(pos, 32)  # dir entries are 32 byte in size
+            attr = entry[11]
+            if entry[0] == 0x00:
+                print('{} does not exist!'.format(shortname))
+                break  # This entry is empty and there are no more entries after this one
+            if attr == 0x0f:
+                # FAT Long Directory Entry
+                print('Long Dir Entry NOT SUPPORTED: ' + entry.hex())
+            else:
+                # "normal" Directory Entry
+                e = {}
+                for k, v in FFSMU.directory_entry_layout.items():
+                    e[k] = entry[v[0]:v[0] + v[1]]
+
+                if e['DIR_Name'].decode('ascii').strip() == shortname:
+                    # possible match found, check if it is a directory
+                    attr = bitarray()
+                    attr.frombytes(e['DIR_Attr'])
+                    if attr[3]:
+                        # directory found
+                        first_clus = e['DIR_FstClusLO'] + e['DIR_FstClusHI']
+                        first_clus = struct.unpack('<I', first_clus)[0]
+                        # change current position
+                        self.current_position = self.get_offset_from_cluster(first_clus)
+                        print('New position: {}'.format(e['DIR_Name'].decode('ascii').strip()))
+                        break
+
+            # prepare new position
+            pos = pos + 32
+            if pos >= (self.get_offset_from_cluster(cluster) + self.CLUSTER_SIZE):
+                # end of cluster reached, go to beginning of next cluster if available
+                if len(cluster_chain) == 0:
+                    return
+                else:
+                    cluster = cluster_chain.pop(0)  # get next cluster
+                    pos = self.get_offset_from_cluster(cluster)
 
     def import_file(self, file):
         """
@@ -184,17 +281,98 @@ class FFSMU:
         Creates a new directory entry at the current position,
         writes the content of the file to the filesystem in one or more empty clusters
         """
-        print('IMPLEMENT')  # TODO implement
+        cluster = self.get_cluster_from_offset(self.current_position)
+        cluster_chain = self.get_cluster_chain(cluster)  # get cluster allocated to current position
+        cluster_chain.pop(0)  # remove first cluster (current cluster already setted)
+        pos = self.current_position
+        while True:
+            # get first empty entry
+            entry = self.disk.read(pos, 32)  # dir entries are 32 byte in size
+            attr = entry[11]
+            if entry[0] == 0x00:
+                # empty entry found
+                parts = file.split('.')
+                name = parts[0].upper()
+                ext = b''
+                if len(name) > 8:   # trim file name if too long
+                    name = name[:8]
+                while len(name) < 8:   # pad file name if too short
+                    name = name + ' '
+
+                if len(parts) > 1:  # check if file has extension
+                    ext = parts[-1].upper()
+                    if len(ext) > 3:
+                        ext = ext[:3]
+                    while len(ext) < 3:
+                        name = ext + ' '
+                else:
+                    ext = '   '
+
+                DIR_Name = name.encode() + ext.encode()    # final shortname of entry
+                DIR_Attr = bitarray('00100000').tobytes()     # ATTR_ARCHIVE set to 1 because new file is written
+                DIR_NTRes = b'\x00'
+                DIR_CrtTimeTenth = b'\x00'
+                DIR_CrtTime = b'\x00\x00'
+                DIR_CrtDate = b'\x00\x00'
+                DIR_LstAccDate = b'\x00\x00'
+                DIR_WrtTime = b'\x00\x00'
+                DIR_WrtDate = b'\x00\x00'
+
+                # get file size
+                size = os.stat(file).st_size
+                DIR_FileSize = struct.pack('<I', size)
+
+                # allocate clusters for content
+                num_cluster = (size // self.CLUSTER_SIZE) + 1   # compute number of cluster needed to store file
+                allocated_clusters = self.create_cluster_chain(num_cluster)
+                cluster_bytes = struct.pack('<I', allocated_clusters[0])
+
+                # compute first cluster entry
+                DIR_FstClusLO = cluster_bytes[:2]
+                DIR_FstClusHI = cluster_bytes[2:]
+
+                # write entry to filesystem
+                entry = DIR_Name + DIR_Attr + DIR_NTRes + DIR_CrtTimeTenth + DIR_CrtTime + DIR_CrtDate + DIR_LstAccDate + DIR_FstClusHI + DIR_WrtTime + DIR_WrtDate + DIR_FstClusLO + DIR_FileSize
+                self.disk.write(pos, entry) # write to disk
+
+                # write file content to clusters
+                f = open(file, "rb")
+                remaining = size
+                while remaining > 0:
+                    # read file one cluster at the time and write it to the disk
+                    content = f.read(self.CLUSTER_SIZE)
+                    remaining = remaining - len(content)
+                    curr_clust = allocated_clusters.pop(0)
+                    self.write_cluster(curr_clust, content)
+                f.close()
+
+                if len(allocated_clusters) != 0:
+                    print("import_file() exception!")   # sanity check, after importing we should have used all clusters
+                return
+
+            # prepare new position
+            pos = pos + 32
+            if pos >= (self.get_offset_from_cluster(cluster) + self.CLUSTER_SIZE):
+                # end of cluster reached, go to beginning of next cluster if available
+                if len(cluster_chain) == 0:
+                    return
+                else:
+                    cluster = cluster_chain.pop(0)  # get next cluster
+                    pos = self.get_offset_from_cluster(cluster)
 
 
 def main():
     d = Disk(512)
-    d.import_from_dictionary('2gdict')
+    d.import_from_dictionary('mediadict')
     h = FFSMU(d)
 
-    h.get_cluster_chain(2)
-    h.ls()
-    print('test') # TODO remove
+    h.cd('test')
+    h.cd('MEDIA')
+
+    h.import_file('testo.txt')
+    h.disk.export_as_image('endresult')
+
+    print('END') # TODO remove
 
 
 if __name__ == '__main__':
