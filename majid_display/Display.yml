@@ -1,0 +1,86 @@
+include:
+  - ./cortexm_memory.yml
+  - ./../configs/hals/stm32f4_hal.yml
+  - ./Display_addrs.yml
+
+use_nvic: True
+use_timers: True
+
+memory_map:
+  ivt: {base_addr: 0x0, file: ./Display.bin,
+    permissions: r-x, size: 0x800000}
+  rom: {base_addr: 0x08000000, file: ./Display.bin,
+    permissions: r-x, size: 0x80000}
+
+handlers:
+  udp_next_iss:
+    handler: hal_fuzz.handlers.lwip.udp_next_iss_hack
+
+  I2C_WaitOnFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnMasterAddressFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnTXEFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnBTFFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnRXNEFlagUntilTimeout:
+    handler: hal_fuzz.handlers.generic.return_zero
+  HAL_GPIO_Init:
+    handler: hal_fuzz.handlers.custom.gpio_init
+  HAL_GPIO_WritePin:
+    handler: hal_fuzz.handlers.custom.gpio_write_pin
+  HAL_GPIO_TogglePin:
+    handler: hal_fuzz.handlers.custom.gpio_toggle_pin
+  HAL_Delay:
+    handler: # removed to make fuzzing faster
+
+  HAL_RCCEx_PeriphCLKConfig:
+    handler: hal_fuzz.handlers.generic.return_zero
+  BSP_IO_Init:
+    handler: hal_fuzz.handlers.generic.return_zero
+  BSP_IO_ConfigPin:
+    handler: hal_fuzz.handlers.generic.return_zero
+  BSP_IO_WritePin:
+    handler: hal_fuzz.handlers.custom.print_r01
+  BSP_SD_IsDetected:
+    handler: hal_fuzz.handlers.custom.return_one
+
+  HAL_SD_InitCard:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  HAL_SD_Init:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_sd.HAL_SD_Init
+  HAL_SD_ConfigWideBusOperation:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_sd.HAL_SD_ConfigWideBusOperation
+  HAL_SD_GetCardState:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_sd.HAL_SD_GetCardState
+  HAL_SD_WriteBlocks:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_sd.HAL_SD_WriteBlocks
+  HAL_SD_ReadBlocks:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_sd.HAL_SD_ReadBlocks
+
+  Error_Handler:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_sd.Error_Handler
+
+  # DISPLAY
+  HAL_DSI_Init:
+    handler: hal_fuzz.handlers.generic.return_zero
+  OTM8009A_Init:
+    handler: hal_fuzz.handlers.generic.return_zero
+  #HAL_LTDC_ConfigLayer:
+  #  handler: hal_fuzz.handlers.generic.return_zero
+  LL_FillBuffer:
+    handler:  # do nothing
+  BSP_LCD_DisplayStringAt:
+    handler: hal_fuzz.handlers.custom.lcd.BSP_LCD_DisplayStringAt
+  HAL_DMA2D_PollForTransfer:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  # SDRAM
+  HAL_SDRAM_Init:
+    handler: hal_fuzz.handlers.generic.return_zero
+  BSP_SDRAM_Initialization_sequence:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+

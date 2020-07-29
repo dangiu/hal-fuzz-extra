@@ -1,0 +1,13 @@
+HOW TO RUN:
+python -m hal_fuzz.harness -c Display.yml ./inputs/garbage
+
+TIPS:
+Create a running configuration in pycharm so it's easier to launch and debug
+
+e.g
+python3 -m hal_fuzz.harness -c Display.yml ./inputs/garbage -d -t -b 0x080005f4
+
+INFO:
+After replacing some hal we have unmapped writes error!
+This is because the location of the file buffer for the LCD display is hardcoded as (0xc0000000) which is normally unmapped!
+By creating a map inside the configuration of hal-fuzz we can solve this problem and emulation works!
