@@ -1,6 +1,6 @@
 include:
   - ./cortexm_memory.yml
-  - ./stm32f4_hal.yml
+  - ./../configs/hals/stm32f4_hal.yml
   - ./Fatfs_addrs.yml
 
 use_nvic: True

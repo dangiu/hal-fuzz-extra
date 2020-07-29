@@ -37,8 +37,6 @@ handlers:
     handler:
   HAL_TIM_PWM_Init:
     handler: hal_fuzz.handlers.generic.return_zero
-  HAL_TIMEx_MasterConfigSynchronization:
-    handler: hal_fuzz.handlers.generic.return_zero
   HAL_TIM_PWM_ConfigChannel:
     handler: hal_fuzz.handlers.generic.return_zero
   HAL_TIM_PWM_Start:

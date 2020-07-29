@@ -209,6 +209,7 @@ def HAL_SD_ReadBlocks(uc):
 
 def Error_Handler(uc):
     # TODO remove this, just used for debugging purposes
-    while True:
-        print("ERROR HANDLER")
+    print("ERROR HANDLER")
+    import ipdb;
+    ipdb.set_trace()
 

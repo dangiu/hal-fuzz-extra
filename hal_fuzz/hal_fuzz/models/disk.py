@@ -127,14 +127,3 @@ class Disk:
             f.write(struct.pack('>I', k))
             f.write(v)
         f.close()
-
-
-def main():
-    # TODO remove this, used only for testing
-    d = Disk(512)
-    d.import_from_image('media')
-    d.export_as_dictionary('mediadict')
-    print('END')
-
-if __name__ == '__main__':
-    main()

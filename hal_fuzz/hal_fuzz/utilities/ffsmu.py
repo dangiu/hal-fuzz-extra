@@ -2,7 +2,7 @@
 # FAT FileSystem Manipulation Utility - FFSMU
 
 import struct
-from majid_fatfs.disk import Disk
+from hal_fuzz.models.disk import Disk
 from bitarray import bitarray
 import os
 
@@ -113,8 +113,6 @@ class FFSMU:
             print('Error write_cluster(): content must be smaller than CLUSTER_SIZE')
             return
 
-        # TODO test this method
-
         content_index = 0
         offset = self.get_offset_from_cluster(cluster)
         end_offset = offset + self.CLUSTER_SIZE
@@ -122,7 +120,7 @@ class FFSMU:
             # get a block worth of content
             if content_index + self.disk.block_size < len(content):
                 chunk = content[content_index:content_index + self.disk.block_size]
-            if content_index < len(content):
+            elif content_index < len(content):
                 # get last bit of content
                 chunk = content[content_index:]
                 # pad content with 0 until end of block
@@ -214,7 +212,14 @@ class FFSMU:
                 first_clus = e['DIR_FstClusLO'] + e['DIR_FstClusHI']
                 first_clus = struct.unpack('<I', first_clus)[0]
                 size = struct.unpack('<I', e['DIR_FileSize'])[0]
-                print('{}.{} -- Attr: {} -- Clus: {} -- Size in bytes: {}'.format(e['DIR_Name'].decode('ascii').strip(), e['DIR_Ext'].decode('ascii'), attr, first_clus, size))
+                if attr[3]:
+                    # directory found
+                    print('{} -- Attr: {} -- Clus: {} -- Size in bytes: {}'.format(
+                        e['DIR_Name'].decode('ascii').strip(), attr, first_clus, size))
+                else:
+                    # file
+                    print('{}.{} -- Attr: {} -- Clus: {} -- Size in bytes: {}'.format(
+                        e['DIR_Name'].decode('ascii').strip(), e['DIR_Ext'].decode('ascii'), attr, first_clus, size))
 
             # prepare new position
             pos = pos + 32
@@ -359,21 +364,3 @@ class FFSMU:
                 else:
                     cluster = cluster_chain.pop(0)  # get next cluster
                     pos = self.get_offset_from_cluster(cluster)
-
-
-def main():
-    d = Disk(512)
-    d.import_from_dictionary('mediadict')
-    h = FFSMU(d)
-
-    h.cd('test')
-    h.cd('MEDIA')
-
-    h.import_file('testo.txt')
-    h.disk.export_as_image('endresult')
-
-    print('END') # TODO remove
-
-
-if __name__ == '__main__':
-    main()
