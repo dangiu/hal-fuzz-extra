@@ -8,7 +8,6 @@
 import libscrc
 from bitarray import bitarray
 from hal_fuzz.models.disk import Disk
-from hal_fuzz.utilities.ffsmu import FFSMU
 
 
 def crc_and_last_bit(input_bytes):
@@ -182,10 +181,4 @@ class SDModel:
     # initialize empty disk
     disk = Disk(BLOCK_SIZE)
 
-    # import file to disk (this section must be changed based on what the fuzzed firmware does)
-    disk.import_from_dictionary('mediadict')
-    fs = FFSMU(disk)
-    fs.ls()
-    fs.cd('MEDIA')
-    fs.ls()
-    fs.import_file('Media/image01.bmp')
+    # input is loaded from SD HAL during HAL_SD_Init()

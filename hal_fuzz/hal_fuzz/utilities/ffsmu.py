@@ -2,8 +2,8 @@
 # FAT FileSystem Manipulation Utility - FFSMU
 
 import struct
-from hal_fuzz.models.disk import Disk
 from bitarray import bitarray
+from io import BytesIO
 import os
 
 
@@ -342,6 +342,90 @@ class FFSMU:
 
                 # write file content to clusters
                 f = open(file, "rb")
+                remaining = size
+                while remaining > 0:
+                    # read file one cluster at the time and write it to the disk
+                    content = f.read(self.CLUSTER_SIZE)
+                    remaining = remaining - len(content)
+                    curr_clust = allocated_clusters.pop(0)
+                    self.write_cluster(curr_clust, content)
+                f.close()
+
+                if len(allocated_clusters) != 0:
+                    print("import_file() exception!")   # sanity check, after importing we should have used all clusters
+                return
+
+            # prepare new position
+            pos = pos + 32
+            if pos >= (self.get_offset_from_cluster(cluster) + self.CLUSTER_SIZE):
+                # end of cluster reached, go to beginning of next cluster if available
+                if len(cluster_chain) == 0:
+                    return
+                else:
+                    cluster = cluster_chain.pop(0)  # get next cluster
+                    pos = self.get_offset_from_cluster(cluster)
+
+    def create_file(self, name, content):
+        """
+        Given a filenaame and content it to the filesystem.
+        Creates a new directory entry at the current position,
+        writes the content to the filesystem in one or more empty clusters
+        """
+        cluster = self.get_cluster_from_offset(self.current_position)
+        cluster_chain = self.get_cluster_chain(cluster)  # get cluster allocated to current position
+        cluster_chain.pop(0)  # remove first cluster (current cluster already setted)
+        pos = self.current_position
+        while True:
+            # get first empty entry
+            entry = self.disk.read(pos, 32)  # dir entries are 32 byte in size
+            attr = entry[11]
+            if entry[0] == 0x00:    # empty entry found
+                parts = name.split('.')
+                name = parts[0].upper()
+                ext = b''
+                if len(name) > 8:   # trim file name if too long
+                    name = name[:8]
+                while len(name) < 8:   # pad file name if too short
+                    name = name + ' '
+
+                if len(parts) > 1:  # check if file has extension
+                    ext = parts[-1].upper()
+                    if len(ext) > 3:
+                        ext = ext[:3]
+                    while len(ext) < 3:
+                        name = ext + ' '
+                else:
+                    ext = '   '
+
+                DIR_Name = name.encode() + ext.encode()    # final shortname of entry
+                DIR_Attr = bitarray('00100000').tobytes()     # ATTR_ARCHIVE set to 1 because new file is written
+                DIR_NTRes = b'\x00'
+                DIR_CrtTimeTenth = b'\x00'
+                DIR_CrtTime = b'\x00\x00'
+                DIR_CrtDate = b'\x00\x00'
+                DIR_LstAccDate = b'\x00\x00'
+                DIR_WrtTime = b'\x00\x00'
+                DIR_WrtDate = b'\x00\x00'
+
+                # get file size
+                size = len(content)
+                DIR_FileSize = struct.pack('<I', size)
+
+                # allocate clusters for content
+                num_cluster = (size // self.CLUSTER_SIZE) + 1   # compute number of cluster needed to store file
+                allocated_clusters = self.create_cluster_chain(num_cluster)
+                cluster_bytes = struct.pack('<I', allocated_clusters[0])
+
+                # compute first cluster entry
+                DIR_FstClusLO = cluster_bytes[:2]
+                DIR_FstClusHI = cluster_bytes[2:]
+
+                # write entry to filesystem
+                entry = DIR_Name + DIR_Attr + DIR_NTRes + DIR_CrtTimeTenth + DIR_CrtTime + DIR_CrtDate + DIR_LstAccDate + DIR_FstClusHI + DIR_WrtTime + DIR_WrtDate + DIR_FstClusLO + DIR_FileSize
+                self.disk.write(pos, entry) # write to disk
+
+                # write file content to clusters
+                f = BytesIO(content)
                 remaining = size
                 while remaining > 0:
                     # read file one cluster at the time and write it to the disk

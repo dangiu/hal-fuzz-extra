@@ -3,12 +3,31 @@
 from unicorn.arm_const import *
 import struct
 from ...models.sd import SDModel
+from hal_fuzz.models.disk import Disk
+from hal_fuzz.utilities.ffsmu import FFSMU
+from hal_fuzz.handlers.fuzz import get_fuzz, fuzz_remaining
 import re
 
-DEBUG = True
+DEBUG = False
 
 # HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
 def HAL_SD_Init(uc):
+    # load input to fuzz into SDModel
+    d = Disk(SDModel.BLOCK_SIZE)
+    d.import_from_dictionary('mediadict')
+    fs = FFSMU(d)
+    fs.ls()
+    fs.cd('MEDIA')
+    fs.ls()
+
+    input = b''
+    if fuzz_remaining() > 0:
+        input = input + get_fuzz(fuzz_remaining())
+
+    fs.create_file('image01.bmp', input)
+
+    SDModel.disk = d    # replace disk
+
     # get hsd base pointer
     hsd_bp = uc.reg_read(UC_ARM_REG_R0)
 
