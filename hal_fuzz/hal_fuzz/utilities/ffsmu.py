@@ -294,9 +294,9 @@ class FFSMU:
             # get first empty entry
             entry = self.disk.read(pos, 32)  # dir entries are 32 byte in size
             attr = entry[11]
-            if entry[0] == 0x00:
-                # empty entry found
-                parts = file.split('.')
+            if entry[0] == 0x00:    # empty entry found
+                filename = file.split('/')[-1]  # get filename (last part of the path)
+                parts = filename.split('.')
                 name = parts[0].upper()
                 ext = b''
                 if len(name) > 8:   # trim file name if too long

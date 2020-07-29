@@ -184,10 +184,8 @@ class SDModel:
 
     # import file to disk (this section must be changed based on what the fuzzed firmware does)
     disk.import_from_dictionary('mediadict')
-    #fs = FFSMU(disk)
-    #fs.ls()
-    #fs.cd('MEDIA')
-    #fs.ls()
-    #fs.import_file('Media/image01.bmp')
-    print('0')
-
+    fs = FFSMU(disk)
+    fs.ls()
+    fs.cd('MEDIA')
+    fs.ls()
+    fs.import_file('Media/image01.bmp')
