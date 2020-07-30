@@ -11,3 +11,10 @@ INFO:
 After replacing some hal we have unmapped writes error!
 This is because the location of the file buffer for the LCD display is hardcoded as (0xc0000000) which is normally unmapped!
 By creating a map inside the configuration of hal-fuzz we can solve this problem and emulation works!
+
+
+FUZZING INFO:
+The number of instruction limited to 400000, this allows the program to run a "full cycle".
+This is done because there is no way to "consume" the input, this firmware performs an infinite loop displaying over and over the same image reading the data from the SD card.
+However the data is not read just once, because due to how the data is accessed on the SD card it might be necessary to read the same sector more than once (in order to read headers or parse the structure of the file) so we
+cannot "consume" the input and end the program once it asks for more.
