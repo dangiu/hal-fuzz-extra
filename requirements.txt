@@ -6,3 +6,5 @@ capstone
 IPython
 ipdb
 dpkt
+libscrc
+bitarray
