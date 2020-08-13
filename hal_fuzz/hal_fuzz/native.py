@@ -215,10 +215,15 @@ def add_timer(reload_val, callback=None, isr_num=IRQ_NOT_USED):
     global timer_cb_user_data
     global native_lib
     
-    #assert (timer_cb_wrapper is not None and timer_cb_user_data is not None)
-    if timer_cb_wrapper is not None or timer_cb_user_data is not None:
-        print("WARNING: You just tried to use a timer, and timers are not enabled! Try adding `use_timers: True` and `use_nvic: True` to your firmware's YAML file.")
-        sys.exit(1)
+    assert (timer_cb_wrapper is not None and timer_cb_user_data is not None)
+
+    # ATTENTION, this code is bugged and is present in the original hal-fuzz repo
+    # The bug was introduced in commit 46a9421
+    # This brakes default test scripts and possibly renders meaningless the result obtained during fuzzing
+
+    #if timer_cb_wrapper is not None or timer_cb_user_data is not None:
+    #    print("WARNING: You just tried to use a timer, and timers are not enabled! Try adding `use_timers: True` and `use_nvic: True` to your firmware's YAML file.")
+    #    sys.exit(1)
     # While technically allowed in the C code, invoking a callback and pending an interrupt at the same time is nothing we would like to support
     assert (not (callback is not None and isr_num != IRQ_NOT_USED))
 
