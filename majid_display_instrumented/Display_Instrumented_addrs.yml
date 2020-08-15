@@ -1,0 +1,320 @@
+architecture: ARMCortexM
+base_address: 134217728
+entry_point: 135268325
+symbols:
+  134218177: __do_global_dtors_aux
+  134218213: frame_dummy
+  134218241: __aeabi_uldivmod
+  134218289: __udivmoddi4
+  134219005: __aeabi_idiv0
+  134219009: memchr
+  134219169: Reset_Handler
+  134219249: DMA1_Stream3_IRQHandler
+  134219253: Storage_OpenReadFile
+  134219401: Storage_GetDirectoryBitmapFiles
+  134219553: Buffercmp
+  134219589: Storage_CheckBitmapFile
+  135269761: Error_Handler  # DONE
+  135269823: main # DONE
+  134220369: MPU_RegionConfig
+  134220477: broker
+  134220495: NMI_Handler
+  134220497: HardFault_Handler
+  134220499: MemManage_Handler
+  134220501: BusFault_Handler
+  134220503: UsageFault_Handler
+  134220505: SVC_Handler
+  134220507: DebugMon_Handler
+  134220509: PendSV_Handler
+  134220511: SysTick_Handler
+  134220517: SDIO_IRQHandler
+  134220529: DMA2_Stream3_IRQHandler
+  134220541: mfxstm32l152_DeInit
+  134220585: mfxstm32l152_IO_ClearIT
+  134220639: mfxstm32l152_Reset
+  134220659: mfxstm32l152_LowPower
+  134220677: mfxstm32l152_ReadID
+  134220701: mfxstm32l152_IO_Start
+  134220753: mfxstm32l152_reg24_setPinValue
+  134220907: mfxstm32l152_IO_ReadPin
+  134220951: mfxstm32l152_IO_ITStatus
+  134220995: mfxstm32l152_TS_Start
+  134221105: mfxstm32l152_IDD_Start
+  134221135: mfxstm32l152_IDD_Config
+  134221539: mfxstm32l152_Error_ReadSrc
+  134221547: mfxstm32l152_Error_ReadMsg
+  134221555: mfxstm32l152_TS_GetXY
+  134221617: mfxstm32l152_IDD_GetValue
+  134221659: mfxstm32l152_IO_WritePin
+  134221677: mfxstm32l152_TS_DetectTouch
+  134221709: mfxstm32l152_WakeUp
+  134221749: mfxstm32l152_EnableITSource
+  134221779: mfxstm32l152_IO_EnableIT
+  134221799: mfxstm32l152_TS_EnableIT
+  134221819: mfxstm32l152_IDD_EnableIT
+  134221839: mfxstm32l152_Error_EnableIT
+  134221859: mfxstm32l152_DisableITSource
+  134221889: mfxstm32l152_IO_DisableIT
+  134221895: mfxstm32l152_TS_DisableIT
+  134221901: mfxstm32l152_IDD_DisableIT
+  134221907: mfxstm32l152_Error_DisableIT
+  134221913: mfxstm32l152_GlobalITStatus
+  134221927: mfxstm32l152_TS_ITStatus
+  134221933: mfxstm32l152_IDD_GetITStatus
+  134221939: mfxstm32l152_Error_GetITStatus
+  134221945: mfxstm32l152_ClearGlobalIT
+  134221953: mfxstm32l152_TS_ClearIT
+  134221959: mfxstm32l152_IDD_ClearIT
+  134221965: mfxstm32l152_Error_ClearIT
+  134221971: mfxstm32l152_SetIrqOutPinPolarity
+  134222007: mfxstm32l152_SetIrqOutPinType
+  134222045: mfxstm32l152_Init
+  134222113: mfxstm32l152_IO_InitPin
+  134222123: mfxstm32l152_IO_SetIrqEvtMode
+  134222145: mfxstm32l152_IO_SetIrqTypeMode
+  134222167: mfxstm32l152_IO_EnablePinIT
+  134222177: mfxstm32l152_IO_DisablePinIT
+  134222187: mfxstm32l152_IO_Config
+  135277781: OTM8009A_Init  # DONE
+  134223965: I2Cx_Init
+  134224173: I2Cx_Error.isra.1
+  134224193: I2Cx_Write
+  134224237: I2Cx_Read
+  134224289: I2Cx_ReadMultiple
+  134224337: BSP_LED_Init
+  134224421: BSP_LED_On
+  134224449: MFX_IO_Init
+  134224453: MFX_IO_DeInit
+  134224457: MFX_IO_ITConfig
+  134224577: MFX_IO_Write
+  134224583: MFX_IO_Read
+  134224589: MFX_IO_ReadMultiple
+  134224609: MFX_IO_Delay
+  134224613: MFX_IO_Wakeup
+  134224615: MFX_IO_EnableWakeupPin
+  134224617: OTM8009A_IO_Delay
+  134224621: BSP_IO_Init  # NOT FOUND
+  134224685: BSP_IO_ConfigPin  # NOT FOUND
+  134224709: BSP_IO_WritePin  # NOT FOUND
+  134224729: BSP_IO_ReadPin
+  135284795: LL_FillBuffer  # DONE
+  134224845: BSP_LCD_Reset
+  134224941: BSP_LCD_LayerDefaultInit
+  134225045: BSP_LCD_SelectLayer
+  134225057: BSP_LCD_SetTransparency
+  134225069: BSP_LCD_SetTextColor
+  134225089: BSP_LCD_Clear
+  134225141: BSP_LCD_DrawBitmap
+  134225417: DSI_IO_WriteCmd
+  134225469: BSP_LCD_MspInit
+  134225641: BSP_LCD_InitEx
+  134226045: BSP_LCD_Init
+  134226053: BSP_LCD_DrawPixel
+  134226097: BSP_LCD_DisplayChar
+  135294265: BSP_LCD_DisplayStringAt  # DONE
+  134226425: BSP_LCD_DisplayStringAtLine
+  134226465: BSP_SD_IsDetected  # NOT FOUND
+  134226533: BSP_SD_ReadBlocks
+  134226565: BSP_SD_WriteBlocks
+  134226597: BSP_SD_MspInit
+  134227029: BSP_SD_Init
+  134227129: BSP_SD_GetCardState
+  134227149: BSP_SD_GetCardInfo
+  134227161: BSP_SD_AbortCallback
+  134227163: HAL_SD_AbortCallback
+  134227171: BSP_SD_WriteCpltCallback
+  134227173: HAL_SD_TxCpltCallback
+  134227181: BSP_SD_ReadCpltCallback
+  134227183: HAL_SD_RxCpltCallback
+  135299261: BSP_SDRAM_Initialization_sequence  # DONE
+  134227337: BSP_SDRAM_MspInit
+  134227745: BSP_SDRAM_Init
+  134227873: SystemInit
+  134227949: HAL_MspInit
+  135305247: HAL_InitTick  # DONE
+  135305529: HAL_Init  # DONE
+  134228073: HAL_IncTick
+  134228097: HAL_GetTick
+  135305993: HAL_Delay  # DONE
+  134228109: HAL_Delay_OLD  # old function is still being used need to hook also this one
+  134228149: HAL_NVIC_SetPriorityGrouping
+  134228185: HAL_NVIC_SetPriority
+  134228289: HAL_NVIC_EnableIRQ
+  135306611: HAL_SYSTICK_Config  # DONE
+  134228361: HAL_MPU_Disable
+  134228393: HAL_MPU_Enable
+  134228429: HAL_MPU_ConfigRegion
+  134228509: DMA_CalcBaseAndBitshift
+  134228553: HAL_DMA_Init
+  134228805: HAL_DMA_DeInit
+  134228889: HAL_DMA_Abort_IT
+  134228925: HAL_DMA_IRQHandler
+  134229305: DMA2D_SetConfig
+  134229437: HAL_DMA2D_MspInit
+  134229439: HAL_DMA2D_Init
+  134229527: HAL_DMA2D_Start
+  135313951: HAL_DMA2D_PollForTransfer  # DONE
+  134229837: HAL_DMA2D_ConfigLayer
+  134229985: DSI_ShortWrite
+  134230051: HAL_DSI_MspInit
+  135316427: HAL_DSI_Init # DONE
+  134230405: HAL_DSI_MspDeInit
+  134230407: HAL_DSI_DeInit
+  134230557: HAL_DSI_ConfigVideoMode
+  134231061: HAL_DSI_ConfigPhyTimer
+  134231181: HAL_DSI_Start
+  134231251: HAL_DSI_ShortWrite
+  134231285: HAL_DSI_LongWrite
+  135326425: HAL_GPIO_Init  # DONE
+  134231949: HAL_GPIO_WritePin  # NOT FOUND
+  134231959: I2C_IsAcknowledgeFailed
+  134232011: I2C_WaitOnMasterAddressFlagUntilTimeout  # NOT FOUND
+  134232127: I2C_WaitOnBTFFlagUntilTimeout  # NOT FOUND
+  134232203: I2C_WaitOnRXNEFlagUntilTimeout  # NOT FOUND
+  134232297: I2C_WaitOnFlagUntilTimeout  # NOT FOUND
+  134232395: I2C_WaitOnTXEFlagUntilTimeout  # NOT FOUND
+  134232473: I2C_RequestMemoryWrite
+  134232629: I2C_RequestMemoryRead
+  134232865: HAL_I2C_MspInit
+  134232869: HAL_I2C_Init  # NOT FOUND
+  134233197: HAL_I2C_MspDeInit
+  134233199: HAL_I2C_DeInit
+  134233249: HAL_I2C_Mem_Write  # NOT FOUND
+  134233537: HAL_I2C_Mem_Read  # NOT FOUND
+  134234073: HAL_I2C_GetState
+  134234079: LTDC_SetConfig
+  134234347: HAL_LTDC_MspInit
+  134234349: HAL_LTDC_Init
+  134234565: HAL_LTDC_ConfigLayer
+  134234647: HAL_LTDC_SetAlpha
+  134234711: HAL_LTDCEx_StructInitFromVideoConfig
+  135346741: HAL_PWREx_EnableOverDrive  # DONE (not secure)
+  134234909: HAL_RCC_GetSysClockFreq
+  135347609: HAL_RCC_ClockConfig  # DONE
+  134235305: HAL_RCC_GetPCLK1Freq
+  135348665: HAL_RCCEx_PeriphCLKConfig  # DONE
+  135351161: HAL_RCC_OscConfig  # DONE (90% sure)
+  134236821: SD_FindSCR
+  134237023: HAL_SD_MspInit
+  134237025: HAL_SD_ReadBlocks  # NOT FOUND
+  134237463: HAL_SD_WriteBlocks  # NOT FOUND
+  134237843: HAL_SD_ErrorCallback
+  134237845: HAL_SD_GetCardCSD
+  134238289: HAL_SD_InitCard  # NOT FOUND
+  134238777: HAL_SD_Init  # NOT FOUND
+  134238829: HAL_SD_GetCardInfo
+  134238865: HAL_SD_ConfigWideBusOperation  # NOT FOUND
+  134239125: HAL_SD_GetCardState  # NOT FOUND
+  134239165: SD_DMATxAbort
+  134239233: SD_DMARxAbort
+  134239301: HAL_SD_IRQHandler
+  134239729: HAL_SDRAM_MspInit
+  135303573: HAL_SDRAM_Init  # DONE
+  134239795: HAL_SDRAM_SendCommand
+  134239841: HAL_SDRAM_ProgramRefreshRate
+  134239877: FMC_SDRAM_Init
+  134239985: FMC_SDRAM_Timing_Init
+  134240107: FMC_SDRAM_SendCommand
+  134240181: FMC_SDRAM_ProgramRefreshRate
+  134240193: SDMMC_GetCmdResp2
+  134240269: SDMMC_GetCmdResp3
+  134240333: SDIO_Init
+  134240389: SDIO_ReadFIFO
+  134240395: SDIO_WriteFIFO
+  134240405: SDIO_PowerState_ON
+  134240413: SDIO_GetPowerState
+  134240421: SDIO_SendCommand
+  134240459: SDIO_GetResponse
+  134240481: SDMMC_GetCmdResp1
+  134240769: SDIO_ConfigData
+  134240807: SDMMC_CmdBlockLength
+  134240855: SDMMC_CmdReadSingleBlock
+  134240903: SDMMC_CmdReadMultiBlock
+  134240951: SDMMC_CmdWriteSingleBlock
+  134240999: SDMMC_CmdWriteMultiBlock
+  134241049: SDMMC_CmdStopTransfer
+  134241101: SDMMC_CmdSelDesel
+  134241149: SDMMC_CmdGoIdleState
+  134241229: SDMMC_CmdOperCond
+  134241341: SDMMC_CmdAppCommand
+  134241389: SDMMC_CmdAppOperCommand
+  134241439: SDMMC_CmdBusWidth
+  134241487: SDMMC_CmdSendSCR
+  134241535: SDMMC_CmdSendCID
+  134241577: SDMMC_CmdSendCSD
+  134241621: SDMMC_CmdSetRelAdd
+  134241789: SDMMC_CmdSendStatus
+  134241837: disk_status
+  134241857: disk_initialize
+  134241889: disk_read
+  134241917: disk_write
+  134241945: disk_ioctl
+  134241973: get_fattime
+  134241977: ld_dword
+  134241993: st_dword
+  134242009: mem_set
+  134242021: chk_lock
+  134242137: inc_lock
+  134242265: dec_lock
+  134242321: clust2sect
+  134242343: clmt_clust
+  134242377: get_ldnumber
+  134242435: validate
+  134242487: mem_cpy.part.0
+  134242505: ld_clust.isra.1
+  134242533: st_clust.isra.2
+  134242557: get_fileinfo.part.3
+  134242643: sync_window.part.4
+  134242713: sync_window
+  134242725: move_window
+  134242781: check_fs
+  134242909: find_volume
+  134243613: put_fat
+  134243861: get_fat.isra.8
+  134244041: create_chain
+  134244217: remove_chain
+  134244327: sync_fs
+  134244477: dir_sdi.constprop.12
+  134244579: dir_next
+  134244813: follow_path
+  134245193: dir_read.constprop.10
+  134245277: dir_register
+  134245377: f_mount
+  134245477: f_open
+  134246013: f_read
+  134246359: f_sync
+  134246503: f_close
+  134246537: f_opendir
+  134246669: f_readdir
+  134246737: FATFS_LinkDriverEx
+  134246805: FATFS_LinkDriver
+  134246813: SD_CheckStatus.isra.0
+  134246845: SD_initialize
+  134246873: SD_status
+  134246877: SD_read
+  134246909: SD_ioctl
+  134246989: SD_write
+  134247021: __libc_init_array
+  135403779: malloc # OLD ONE --> 134247093
+  134247109: free
+  134247125: _free_r
+  135404745: _malloc_r # OLD ONE --> 134247281
+  134247461: _sbrk_r
+  134247493: siprintf
+  134247557: strcpy
+  134247573: __malloc_lock
+  134247575: __malloc_unlock
+  134247577: __ssputs_r
+  134247757: _svfiprintf_r
+  134248253: _printf_common
+  134248489: _printf_i
+  134249037: memcpy
+  134249059: memmove
+  134249109: _realloc_r
+  134249185: _malloc_usable_size_r
+  134249201: _sbrk
+  134249229: _init
+  134249241: _fini
+  135268325: _start
+  553648196: UnresolvableJumpTarget
+  553648200: UnresolvableCallTarget
