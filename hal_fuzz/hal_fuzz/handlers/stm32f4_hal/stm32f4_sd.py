@@ -6,9 +6,21 @@ from ...models.sd import SDModel
 from hal_fuzz.models.disk import Disk
 from hal_fuzz.utilities.ffsmu import FFSMU
 from hal_fuzz.handlers.fuzz import get_fuzz, fuzz_remaining
+from ...exit import do_exit
 import re
 
 DEBUG = False
+"""
+Limit the reading of the blocks containing the input to N times.
+May be set differently according to the behaviour of the fuzzed firmware.
+This parameter is normally used with firmware that perform and infinite loop
+and never "consume" the input (e.g. read from an SD card, perform operation, repeat).
+By using this parameter we can emulate input consumption and halt the firmware after
+the operations have been performed.
+
+Can be set to 0 to avoid limiting
+"""
+INPUT_READ_LIMIT = 4
 
 # HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
 def HAL_SD_Init(uc):
@@ -214,6 +226,11 @@ def HAL_SD_ReadBlocks(uc):
     # TODO refractor this part
     if number_of_blocks == 1:
         data = SDModel.disk.read_block(block_add)
+        # check for input read limit
+        if INPUT_READ_LIMIT != 0:
+            for addr in SDModel.disk.raw_data:
+                if SDModel.disk.read_count[addr] > INPUT_READ_LIMIT:
+                    do_exit(0)
         # place the content inside the correct buffer
         #  uc.mem_write(hsd_bp + context_offset, struct.pack("<I", state))
         uc.mem_write(data_p, data)

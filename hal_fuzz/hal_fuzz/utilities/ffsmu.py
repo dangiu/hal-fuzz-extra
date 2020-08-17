@@ -104,7 +104,7 @@ class FFSMU:
         else:
             self.disk.write(self.base_offset + (sec_number * self.bs_bpb['BPB_BytsPerSec']), self.bs_bpb['BPB_BytsPerSec'], sec_content)
 
-    def write_cluster(self, cluster, content):
+    def write_cluster(self, cluster, content, mark_as_raw_data):
         """
         Writes content to the beginning of the cluster.
         Content size must be smaller or equal to cluster size, remaining space in cluster is filled with zeros.
@@ -130,7 +130,7 @@ class FFSMU:
                 chunk = bytes(self.disk.block_size)
             content_index = content_index + 512
             # write block
-            self.disk.write(offset, chunk)
+            self.disk.write(offset, chunk, mark_as_raw_data)
             # increase offset
             offset = offset + self.disk.block_size
 
@@ -348,7 +348,7 @@ class FFSMU:
                     content = f.read(self.CLUSTER_SIZE)
                     remaining = remaining - len(content)
                     curr_clust = allocated_clusters.pop(0)
-                    self.write_cluster(curr_clust, content)
+                    self.write_cluster(curr_clust, content, True)
                 f.close()
 
                 if len(allocated_clusters) != 0:
@@ -432,7 +432,7 @@ class FFSMU:
                     content = f.read(self.CLUSTER_SIZE)
                     remaining = remaining - len(content)
                     curr_clust = allocated_clusters.pop(0)
-                    self.write_cluster(curr_clust, content)
+                    self.write_cluster(curr_clust, content, True)
                 f.close()
 
                 if len(allocated_clusters) != 0:

@@ -9,6 +9,16 @@ class Disk:
         self.content = {}               # content of the disk
         self.block_size = block_size    # block size
 
+        """
+        This parameters are used in order to limit the reading on blocks containing the input data
+        such that the input can be "consumed" after processing and the firmware halts,
+        this is a normal workflow used when fuzzing firmwares that would otherwise run on an infinite loop.
+        The list indicating which block are raw data is used to allow a firmware to navigate the filesystem
+        without restriction and only limit the read on the blocks that actually contain the input
+        """
+        self.read_count = {}            # dictionary containing read count for each block
+        self.raw_data = []              # list containing blocks representing raw data (not file system structure)
+
     def read(self, offset, size):
         # TODO span read to multiple blocks
         block_num = offset // self.block_size
@@ -18,7 +28,7 @@ class Disk:
         else:
             return self.read_block(block_num)[block_offset:block_offset + size]
 
-    def write(self, offset, content):
+    def write(self, offset, content, mark_as_raw_data=False):
         # TODO span write to multiple blocks
         block_num = offset // self.block_size
         block_offset = offset % self.block_size
@@ -29,9 +39,9 @@ class Disk:
             left = old_block[:block_offset]
             right = old_block[block_offset + len(content):]
             new_block = left + content + right
-            self.write_block(block_num, new_block)
+            self.write_block(block_num, new_block, mark_as_raw_data)
 
-    def write_block(self, addr, content):
+    def write_block(self, addr, content, mark_as_raw_data=False):
         # write block
         if (len(content) != self.block_size) | (type(content) != bytes):
             print('Disk write_block() error: bad content length')
@@ -41,6 +51,9 @@ class Disk:
                 self.content.pop(addr, None)
             else:
                 self.content[addr] = content
+            # mark block as raw data if needed
+            if mark_as_raw_data:
+                self.mark_block_as_raw_data(addr)
 
     def read_block(self, addr):
         # initialize return value as block (512 bytes) of zeros
@@ -48,20 +61,31 @@ class Disk:
         # if block exists return it
         if addr in self.content:
             block = self.content[addr]
+        # increase read counter
+        if addr in self.read_count:
+            self.read_count[addr] = self.read_count[addr] + 1
+        else:
+            self.read_count[addr] = 1
         return block
 
+    def mark_block_as_raw_data(self, addr):
+        """Append blocks address to the list raw_data."""
+        if addr not in self.raw_data:
+            self.raw_data.append(addr)
+
     def get_block_count(self):
-        # return the number of blocks written (that are not empty) on the disk
+        """Return the number of blocks written (that are not empty) on the disk"""
         return len(self.content.keys())
 
     def get_block_list(self):
-        # return the list of addresses of blocks not empty
+        """Return the list of addresses of blocks not empty."""
         blocks = []
         for addr in self.content.keys():
             blocks.append(addr)
         return blocks
 
     def print_block(self, addr):
+        """Pretty print of a block."""
         if addr in self.content:
             block = self.content[addr]
             block_string = re.sub("(.{32})", "\\1\n", block.hex(), 0, re.DOTALL)
