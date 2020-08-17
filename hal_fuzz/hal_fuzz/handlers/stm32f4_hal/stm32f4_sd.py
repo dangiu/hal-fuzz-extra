@@ -17,8 +17,12 @@ This parameter is normally used with firmware that perform and infinite loop
 and never "consume" the input (e.g. read from an SD card, perform operation, repeat).
 By using this parameter we can emulate input consumption and halt the firmware after
 the operations have been performed.
+Attention, this does NOT directly correspond to the number of time the input is processed
+it's only a gross estimation: while processing the input once, different firmware/driver combinations
+might read a single block of a file multiple times (e.g. the first block of a file is read to detect
+if the file is in the correct format, then read again to perform some other operation).
 
-Can be set to 0 to avoid limiting
+0 = unlimited
 """
 INPUT_READ_LIMIT = 4
 
