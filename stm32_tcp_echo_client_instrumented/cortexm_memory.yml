@@ -1,0 +1,7 @@
+memory_map:
+  ram:  {base_addr:  0x20000000, size: 0x00050000, permissions: rwx}  # amount of ram higher than normal otherwise it performs a write to an unmapped area... is this normal? Is there a peripheral?
+  mmio: {base_addr:  0x40000000, size: 0x10000000, permissions: rw-}
+  nvic: {base_addr:  0xe0000000, size: 0x10000000, permissions: rw-}
+  irq_ret: {base_addr: 0xfffff000, size: 0x1000, permissions: rwx}
+  test: {base_addr: 0xa0000000, size: 0x10000000, permissions: rwx} # weird write cause by malloc in this memory section, if we don't allocate than the emulator crashes.. what is the real cause?
+initial_sp: 0x20014000

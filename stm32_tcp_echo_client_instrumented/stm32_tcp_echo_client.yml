@@ -1,0 +1,92 @@
+include:
+  - ./cortexm_memory.yml
+  - ./../configs/hals/stm32f4_hal.yml
+  - ./stm32_tcp_echo_client_addrs_INST.yml
+
+use_nvic: False
+use_timers: False
+
+memory_map:
+  ivt: {base_addr: 0x0, file: ./stm32_tcp_echo_client.bin,
+    permissions: r-x, size: 0x800000}
+  rom: {base_addr: 0x08000000, file: ./stm32_tcp_echo_client.bin,
+    permissions: r-x, size: 0x800000}
+
+handlers:
+  BSP_IO_ConfigPin_INST:
+    handler:
+  tcp_next_iss_INST:
+    handler: hal_fuzz.handlers.lwip.tcp_next_iss_hack
+
+  ethernetif_input_INST:
+    handler: hal_fuzz.handlers.misc.stm32f4_eth_client.inject_button_click_once
+    do_return: False
+  HAL_GetTick:
+    handler: hal_fuzz.handlers.misc.stm32f4_eth_client.HAL_GetTick
+  HAL_GetTick_INST:
+    handler: hal_fuzz.handlers.misc.stm32f4_eth_client.HAL_GetTick
+
+  I2C_WaitOnFlagUntilTimeout_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnMasterAddressFlagUntilTimeout_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnTXEFlagUntilTimeout_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnBTFFlagUntilTimeout_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  I2C_WaitOnRXNEFlagUntilTimeout_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  HAL_ETH_TransmitFrame_INST:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_eth.HAL_ETH_TransmitFrame
+  HAL_ETH_TransmitFrame:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_eth.HAL_ETH_TransmitFrame
+  HAL_ETH_GetReceivedFrame_INST:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_eth.HAL_ETH_GetReceivedFrame
+  HAL_ETH_WritePHYRegister_INST:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_eth.HAL_ETH_WritePHYRegister
+  HAL_ETH_ReadPHYRegister_INST:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_eth.HAL_ETH_ReadPHYRegister
+
+# INSTRUMENTED HALS
+  HAL_Init_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  HAL_InitTick_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  SystemClock_Config_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  SystemInit_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  HAL_RCC_ClockConfig_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  HAL_RCC_OscConfig_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  HAL_PWREx_EnableOverDrive_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  HAL_SYSTICK_Config_INST:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_base.systick_config
+  HAL_SYSTICK_CLKSourceConfig_INST:
+    handler:
+
+  HAL_Delay_INST:
+    handler:
+  delay_ms_INST:
+    handler:
+
+  HAL_ETH_Init_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  HAL_I2C_Init_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+  HAL_I2C_Mem_Read_INST:
+    handler: hal_fuzz.handlers.stm32f4_hal.stm32f4_i2c.HAL_I2C_Mem_Read
+  HAL_I2C_Mem_Write_INST:
+    handler: hal_fuzz.handlers.generic.return_zero
+
+  HAL_GPIO_Init_INST:
+    handler:
+  HAL_GPIO_WritePin_INST:
+    handler:
+
